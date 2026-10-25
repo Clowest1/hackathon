@@ -14,7 +14,7 @@ function elapsed(at: number, startedAt?: number) {
 }
 
 /** Действия пользователя в среде (без сообщений чата — они идут отдельной историей). */
-export function formatEvents(session: Session, limit: number): string {
+function formatEvents(session: Session, limit: number): string {
   const events = session.events.filter((e) => e.type !== 'chat_message').slice(-limit);
   if (!events.length) return 'пока ничего не делал(а)';
   return events.map((e: SessionEvent) => {

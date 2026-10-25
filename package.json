@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc --noEmit && tsc -p tsconfig.node.json && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test": "vitest run"
   },
   "dependencies": {
     "@codemirror/lang-sql": "^6.10.0",
@@ -27,6 +28,7 @@
     "@vitejs/plugin-react": "^5.2.0",
     "tailwindcss": "^4.3.3",
     "typescript": "~5.8",
-    "vite": "^7.3.7"
+    "vite": "^7.3.7",
+    "vitest": "^3.2.7"
   }
 }

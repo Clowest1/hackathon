@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { Link, Outlet, useLocation } from 'react-router-dom';
 
-export const steps = [
+const steps = [
   { path: '/choose', label: 'Профессия' },
   { path: '/quiz', label: 'База' },
   { path: '/work', label: 'Задача' },

@@ -11,7 +11,7 @@ const IMAGE = `data:image/svg+xml;utf8,${encodeURIComponent(
   </svg>`,
 )}`;
 
-export const CARD_HTML = `<div class="card">
+const CARD_HTML = `<div class="card">
   <img src="${IMAGE}" alt="Керамическая кружка">
   <div class="title">Керамическая кружка</div>
   <div class="price">790 ₽</div>
