@@ -4,3 +4,6 @@ dist
 .env.local
 .vercel
 team/
+!team/
+team/*
+!team/DEMO.md
