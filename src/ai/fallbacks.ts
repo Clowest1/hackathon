@@ -19,6 +19,12 @@ export function hintMessage(profession: Profession, session: Session): string {
   return session.hintsUsed >= hints.length ? `Подсказки закончились, но вот последняя ещё раз: ${hint}` : `Подсказка: ${hint}`;
 }
 
+export function nudge(afterError: boolean): string {
+  return afterError
+    ? 'Вижу, последний шаг не получился. Давай разберёмся вместе: напиши, что пытался(лась) сделать, или нажми «Подсказка».'
+    : 'Как продвигается? Если застрял(а) — напиши мне, что видишь, или нажми «Подсказка». Разберёмся вместе.';
+}
+
 export function feedback(result: CheckResult, session: Session): string {
   const usedGrouping = result.items[1]?.ok;
   const praise = usedGrouping
