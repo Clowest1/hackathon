@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { Link, Outlet, useLocation } from 'react-router-dom';
 
 export const steps = [
@@ -12,6 +13,11 @@ export const steps = [
 export function Layout() {
   const { pathname } = useLocation();
   const current = steps.findIndex((s) => s.path === (pathname === '/recommend' ? '/choose' : pathname));
+
+  // Роутер не сбрасывает прокрутку: без этого новый экран открывается там, где был скролл на прошлом
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
 
   return (
     <div className="flex min-h-dvh flex-col">
