@@ -1,5 +1,129 @@
 @import "tailwindcss";
 
+/*
+ * Палитра RMIT. Акцентная шкала indigo и «ошибочная» rose переопределены цветами бренда,
+ * поэтому все экраны перекрашиваются без правок классов: светлые тона — лавандовые, тёмные — синие.
+ */
 @theme {
-  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-sans: "Avenir Next", Avenir, "Helvetica Neue", Arial, ui-sans-serif, system-ui, sans-serif;
+
+  --color-ink: #172f68;
+  --color-brand: #234b91;
+  --color-lavender: #dcc6f0;
+  --color-lavender-pale: #f0e8fa;
+  --color-canvas: #f8f8fa;
+
+  --color-indigo-50: #f0e8fa;
+  --color-indigo-100: #e8dcf6;
+  --color-indigo-200: #dcc6f0;
+  --color-indigo-300: #b7b4de;
+  --color-indigo-400: #7f8fc4;
+  --color-indigo-500: #3a5ea6;
+  --color-indigo-600: #234b91;
+  --color-indigo-700: #172f68;
+  --color-indigo-800: #12265a;
+  --color-indigo-900: #0f1f47;
+  --color-indigo-950: #0b1736;
+
+  --color-rose-500: #a64457;
+  --color-rose-600: #a64457;
+
+  --color-slate-50: #f8f8fa;
+  --color-slate-200: #e2e5eb;
+  --color-slate-300: #c7cfdd;
+  --color-slate-500: #64708a;
+}
+
+body {
+  background: var(--color-canvas);
+}
+
+/* Логотип RMIT: Arial Black, сжатый по вертикали */
+.rmit-mark {
+  display: inline-block;
+  color: var(--color-ink);
+  font-family: "Arial Black", Arial, ui-sans-serif, sans-serif;
+  font-weight: 900;
+  letter-spacing: -0.095em;
+  line-height: 0.78;
+  transform: scaleY(0.82);
+  transform-origin: 50%;
+}
+
+/* Главная — как в макете команды */
+.landing-screen {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-height: 100dvh;
+  overflow: hidden;
+  background: #fff;
+}
+.landing-screen::before {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  left: -4%;
+  right: -4%;
+  bottom: -10%;
+  height: 34%;
+  background: var(--color-lavender-pale);
+  clip-path: polygon(0 30%, 44% 100%, 100% 36%, 100% 100%, 0 100%);
+}
+.landing-content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(28px, 6vh, 56px);
+  padding: 40px 24px 60px;
+  text-align: center;
+}
+.rmit-wordmark {
+  margin: 0;
+  color: var(--color-ink);
+  font-family: "Arial Black", Arial, ui-sans-serif, sans-serif;
+  font-size: clamp(76px, 19vw, 228px);
+  font-weight: 900;
+  letter-spacing: -0.105em;
+  /* отрицательный трекинг съедает место справа — компенсируем, чтобы слово стояло по центру */
+  padding-left: 0.105em;
+  line-height: 0.74;
+  transform: scaleY(0.82);
+  transform-origin: 50%;
+}
+.landing-tagline {
+  margin: -8px 0 0;
+  color: var(--color-slate-500);
+  font-size: clamp(15px, 1.6vw, 19px);
+  letter-spacing: 0.01em;
+}
+.start-link {
+  display: grid;
+  grid-template-columns: minmax(44px, 1fr) auto minmax(44px, 1fr);
+  align-items: center;
+  gap: 22px;
+  min-width: 230px;
+  padding: 12px 0;
+  border: 0;
+  background: none;
+  color: var(--color-ink);
+  font-size: 21px;
+  font-weight: 650;
+  cursor: pointer;
+}
+.start-rule {
+  display: block;
+  height: 1px;
+  background: var(--color-ink);
+}
+.start-arrow {
+  font-size: 29px;
+  font-weight: 400;
+  line-height: 1;
+  transition: transform 0.18s;
+}
+.start-link:hover .start-arrow {
+  transform: translateX(5px);
 }
