@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Button, Card, Page } from '../components/ui';
+import { AnswerOption, EditorialPage, QuizQuestion } from '../components/ui';
 import { getProfession } from '../professions';
 import { useSession } from '../state/SessionContext';
 
@@ -12,37 +12,30 @@ export default function Reflection() {
   const done = profession.reflectionQuestions.every((q) => answers[q.id]);
 
   return (
-    <Page title="Как тебе?" subtitle="Три вопроса — по ним соберём персональный план.">
-      <div className="space-y-4">
-        {profession.reflectionQuestions.map((q) => (
-          <Card key={q.id}>
-            <p className="font-medium">{q.text}</p>
-            <div className="mt-3 flex flex-wrap gap-2">
-              {q.options.map((o) => (
-                <button
-                  key={o}
-                  onClick={() => setAnswers((a) => ({ ...a, [q.id]: o }))}
-                  className={`rounded-full border px-3 py-1.5 text-sm transition ${
-                    answers[q.id] === o ? 'border-indigo-500 bg-indigo-50 text-indigo-800' : 'border-slate-200 hover:border-slate-300'
-                  }`}
-                >
-                  {o}
-                </button>
-              ))}
-            </div>
-          </Card>
+    <EditorialPage eyebrow="04 / рефлексия" title="Что ты заметил(а)?" subtitle="Ответы помогут собрать план с опорой на твой опыт.">
+      <div className="question-list">
+        {profession.reflectionQuestions.map((q, i) => (
+          <QuizQuestion key={q.id} index={i} total={profession.reflectionQuestions.length} text={q.text}>
+            {q.options.map((o) => (
+              <AnswerOption key={o} selected={answers[q.id] === o} onClick={() => setAnswers((a) => ({ ...a, [q.id]: o }))}>
+                {o}
+              </AnswerOption>
+            ))}
+          </QuizQuestion>
         ))}
       </div>
-      <Button
-        className="mt-8 w-full"
-        disabled={!done}
-        onClick={() => {
-          update({ reflection: answers, roadmap: undefined });
-          navigate('/roadmap');
-        }}
-      >
-        Построить роадмап
-      </Button>
-    </Page>
+      <div>
+        <button
+          className="action-button page-action"
+          disabled={!done}
+          onClick={() => {
+            update({ reflection: answers, roadmap: undefined });
+            navigate('/roadmap');
+          }}
+        >
+          Собрать план <span aria-hidden="true">→</span>
+        </button>
+      </div>
+    </EditorialPage>
   );
 }

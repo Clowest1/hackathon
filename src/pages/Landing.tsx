@@ -14,7 +14,7 @@ export default function Landing() {
     <section className="landing-screen">
       <div className="landing-content">
         <h1 className="rmit-wordmark" aria-label="RMIT">RMIT</h1>
-        <p className="landing-tagline">Попробуй IT-профессию за 30 минут</p>
+        <p className="landing-tagline">Попробуй IT-профессию за 10 минут</p>
         <button className="start-link" onClick={start}>
           <span className="start-rule" aria-hidden="true" />
           <span>Начать</span>

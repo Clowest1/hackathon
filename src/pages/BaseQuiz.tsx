@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Button, Card, Page } from '../components/ui';
+import { AnswerOption, EditorialPage, QuizQuestion } from '../components/ui';
 import { getProfession } from '../professions';
 import { useSession } from '../state/SessionContext';
 import type { Level } from '../types';
@@ -27,47 +27,38 @@ export default function BaseQuiz() {
   };
 
   return (
-    <Page title="Немного о тебе" subtitle="Пара вопросов, чтобы подобрать уровень поддержки. Правильных ответов нет.">
-      <div className="space-y-4">
-        {profession.baseQuestions.map((q) => (
-          <Card key={q.id}>
-            <p className="font-medium">{q.text}</p>
-            <div className="mt-3 flex flex-col gap-2">
-              {q.options.map((o, i) => {
-                const selected = answers[q.id] === o.score;
-                return (
-                  <button
-                    key={i}
-                    onClick={() => update((s) => ({ baseAnswers: { ...s.baseAnswers, [q.id]: o.score } }))}
-                    className={`rounded-lg border px-3 py-2 text-left text-sm transition ${
-                      selected ? 'border-indigo-500 bg-indigo-50 text-indigo-800' : 'border-slate-200 hover:border-slate-300'
-                    }`}
-                  >
-                    {o.label}
-                  </button>
-                );
-              })}
-            </div>
-          </Card>
+    <EditorialPage eyebrow="02 / уровень" title="С чего начнём?" subtitle="Несколько вопросов помогут настроить уровень поддержки.">
+      <div className="question-list">
+        {profession.baseQuestions.map((q, i) => (
+          <QuizQuestion key={q.id} index={i} total={profession.baseQuestions.length} text={q.text}>
+            {q.options.map((o, j) => (
+              <AnswerOption key={j} selected={answers[q.id] === o.score} onClick={() => update((s) => ({ baseAnswers: { ...s.baseAnswers, [q.id]: o.score } }))}>
+                {o.label}
+              </AnswerOption>
+            ))}
+          </QuizQuestion>
         ))}
       </div>
 
       {done && (
-        <Card className="mt-6 border-indigo-200 bg-indigo-50/60">
-          <p className="text-sm text-slate-600">
-            Твой уровень: <b className="text-indigo-700">{levelTitles[level]}</b>
-            {override && <span className="text-slate-500"> (выбран вручную)</span>}
+        <section className="editorial-panel level-note">
+          <p className="eyebrow">Поддержка для тебя</p>
+          <p className="level-result">
+            {levelTitles[level]}
+            {override && <span className="level-manual"> · выбран вручную</span>}
           </p>
-          {profession.levelDescriptions && <p className="mt-1 text-sm text-slate-700">{profession.levelDescriptions[level]}</p>}
-          <button onClick={() => setOverride(otherLevel[level] === computed ? null : otherLevel[level])} className="mt-2 text-sm font-medium text-indigo-600 hover:underline">
+          {profession.levelDescriptions && <p className="level-description">{profession.levelDescriptions[level]}</p>}
+          <button onClick={() => setOverride(otherLevel[level] === computed ? null : otherLevel[level])} className="text-link">
             Хочу уровень «{levelTitles[otherLevel[level]]}»
           </button>
-        </Card>
+        </section>
       )}
 
-      <Button className="mt-6 w-full" disabled={!done} onClick={finish}>
-        К задаче
-      </Button>
-    </Page>
+      <div>
+        <button className="action-button page-action" disabled={!done} onClick={finish}>
+          К задаче <span aria-hidden="true">→</span>
+        </button>
+      </div>
+    </EditorialPage>
   );
 }
