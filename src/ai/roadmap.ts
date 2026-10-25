@@ -1,7 +1,7 @@
 import type { Profession, Roadmap, Session } from '../types';
 import { chatJson, withFallback } from './client';
 import { roadmapMessages } from './prompts';
-import { buildWeeks, describeSession, nextProfession } from './roadmapPlan';
+import { buildSkills, buildWeeks, describeSession, nextProfession, planExtras } from './roadmapPlan';
 
 function stringList(value: unknown, field: string, min: number, max: number): string[] {
   if (!Array.isArray(value)) throw new Error(`${field}: ожидался массив`);
@@ -34,5 +34,5 @@ export async function generateRoadmap(profession: Profession, session: Session):
     (signal) => chatJson(roadmapMessages(profession, session, weeks, next), validateInsights, signal),
     () => describeSession(profession, session),
   );
-  return { ...insights, weeks, ...(next ? { nextProfessionToTry: next } : {}) };
+  return { ...insights, weeks, skills: buildSkills(profession, session), ...planExtras(profession), ...(next ? { nextProfessionToTry: next } : {}) };
 }
