@@ -97,7 +97,11 @@ export function Environment({ onEvent, onSubmit }: EnvironmentProps) {
       setResult({ data, group });
       setGroupedBy((g) => (g.includes(group) ? g : [...g, group]));
       // Краткий результат — чтобы тимлид видел, что именно увидел пользователь
-      const preview = data.rows.slice(0, 8).map((r) => `${r[0]}: ${r[1]}`).join('; ');
+      // (для длинных результатов — начало и конец, чтобы по датам было видно и «до», и «после»)
+      const cell = (r: QueryResult['rows'][number]) => `${r[0]}: ${r[1]}`;
+      const preview = data.rows.length > 8
+        ? [...data.rows.slice(0, 4).map(cell), '…', ...data.rows.slice(-4).map(cell)].join('; ')
+        : data.rows.map(cell).join('; ');
       onEvent({ type: 'query_run', at: Date.now(), payload: { metric, group, status: effectiveStatus(metric, status), period, result: preview, sql } });
     } catch (e) {
       const message = e instanceof Error ? e.message : String(e);

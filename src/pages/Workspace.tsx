@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { TeamleadChat } from '../components/TeamleadChat';
 import { teamleadHint, teamleadReply } from '../ai/teamlead';
+import { useProactiveTeamlead } from '../ai/useProactiveTeamlead';
 import { getProfession } from '../professions';
 import { useSession } from '../state/SessionContext';
 import type { CheckResult, SessionEvent } from '../types';
@@ -13,6 +14,7 @@ export default function Workspace() {
   const { Environment, task } = profession;
   const [chatOpen, setChatOpen] = useState(false);
   const [pending, setPending] = useState(0); // сколько ответов тимлида ещё ждём
+  const [seenMessages, setSeenMessages] = useState(0); // для значка непрочитанного на мобильном
 
   // Старт задачи: брифинг тимлида и таймер (один раз за сессию)
   useEffect(() => {
@@ -33,6 +35,13 @@ export default function Workspace() {
       setPending((n) => n - 1);
     }
   };
+
+  useProactiveTeamlead(profession, session, askTeamlead, pending > 0);
+
+  useEffect(() => {
+    if (chatOpen) setSeenMessages(session.chat.length);
+  }, [chatOpen, session.chat.length]);
+  const unread = !chatOpen && session.chat.length > seenMessages;
 
   const sendMessage = (text: string) => {
     const now = Date.now();
@@ -90,6 +99,7 @@ export default function Workspace() {
           className="fixed right-4 bottom-4 z-20 rounded-full bg-indigo-600 px-5 py-3 font-medium text-white shadow-lg lg:hidden"
         >
           💬 Чат с тимлидом
+          {unread && <span className="absolute -top-1 -right-1 h-3.5 w-3.5 animate-pulse rounded-full border-2 border-white bg-rose-500" aria-label="Новое сообщение" />}
         </button>
       )}
     </div>

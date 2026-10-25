@@ -32,6 +32,7 @@ export interface Profession {
     summary: string;               // 1–2 предложения над рабочей средой: что случилось и что сделать
     briefing: string;              // первое сообщение тимлида: контекст и задача
     goal: string;                  // что считается успехом (для промпта тимлида)
+    workspaceForTeamlead?: Partial<Record<Level, string>>; // что пользователь видит на экране и как сдаёт — чтобы тимлид говорил про реальный интерфейс
     glossary: { term: string; explanation: string }[]; // термины, которые тимлид объясняет по ходу
     hints: Record<Level, string[]>; // подсказки по порядку, от общей к конкретной
     solutionForTeamlead: string;   // правильный ответ — только для промпта, НЕ показывать пользователю
