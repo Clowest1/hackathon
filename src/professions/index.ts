@@ -1,8 +1,9 @@
 import type { Profession, ProfessionCard, ProfessionId } from '../types';
 import { analyst } from './analyst/config';
 import { qa } from './qa/config';
+import { frontend } from './frontend/config';
 
-export const professions: Profession[] = [analyst, qa];
+export const professions: Profession[] = [analyst, qa, frontend];
 
 export const professionCards: ProfessionCard[] = [
   { id: 'analyst', title: analyst.title, shortDescription: analyst.shortDescription, available: true },
@@ -12,12 +13,7 @@ export const professionCards: ProfessionCard[] = [
     shortDescription: 'Ищет ошибки до того, как их найдут пользователи. Проверяет, ломает, пишет баг-репорты.',
     available: true,
   },
-  {
-    id: 'frontend',
-    title: 'Фронтенд-разработчик',
-    shortDescription: 'Делает то, что пользователь видит в браузере: вёрстка, интерфейсы, интерактив.',
-    available: false,
-  },
+  { id: 'frontend', title: frontend.title, shortDescription: frontend.shortDescription, available: true },
 ];
 
 export const getProfession = (id?: ProfessionId) => professions.find((p) => p.id === id);
