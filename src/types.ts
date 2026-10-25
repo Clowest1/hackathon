@@ -78,6 +78,17 @@ export interface Roadmap {
   summary: string;                 // 2–3 предложения: как прошло, к чему склонность
   strengths: string[];
   gaps: string[];
-  weeks: { week: number; focus: string; tasks: string[]; resources: string[] }[]; // 4 недели
+  weeks: {
+    week: number;
+    focus: string;
+    tasks: string[];
+    resources: string[];
+    goal?: string;                 // «к концу недели ты сможешь…»
+    hours?: number;                // примерная нагрузка за неделю
+    why?: string[];                // почему это в плане — ссылки на то, что было в задании
+  }[]; // 4 недели
   nextProfessionToTry?: ProfessionId;
+  skills?: { name: string; level: number; note: string }[]; // навыки профессии 0..3 по итогам задания
+  milestone?: string;              // что человек сможет через 4 недели
+  afterPlan?: string[];            // что делать после плана
 }
