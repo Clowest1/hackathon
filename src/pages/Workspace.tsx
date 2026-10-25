@@ -8,7 +8,7 @@ import type { CheckResult, SessionEvent } from '../types';
 
 export default function Workspace() {
   const navigate = useNavigate();
-  const { session, update } = useSession();
+  const { session, sessionId, update, updateForSession } = useSession();
   const profession = getProfession(session.professionId)!;
   const { Environment, task } = profession;
   const [chatOpen, setChatOpen] = useState(false);
@@ -24,11 +24,11 @@ export default function Workspace() {
   const logEvent = (e: SessionEvent) => update((s) => ({ events: [...s.events, e] }));
 
   // Ответ тимлида приходит асинхронно (LLM или фолбэк) — дописываем его к актуальному чату.
-  const askTeamlead = async (request: Promise<string>) => {
+  const askTeamlead = async (request: Promise<string>, requestSessionId: number) => {
     setPending((n) => n + 1);
     try {
       const text = await request;
-      update((s) => ({ chat: [...s.chat, { role: 'teamlead', text }] }));
+      updateForSession(requestSessionId, (s) => ({ chat: [...s.chat, { role: 'teamlead', text }] }));
     } finally {
       setPending((n) => n - 1);
     }
@@ -42,7 +42,7 @@ export default function Workspace() {
       events: [...session.events, { type: 'chat_message' as const, at: now, payload: text }],
     };
     update({ chat: next.chat, events: next.events });
-    void askTeamlead(teamleadReply(profession, next));
+    void askTeamlead(teamleadReply(profession, next), sessionId);
   };
 
   const hint = () => {
@@ -53,7 +53,7 @@ export default function Workspace() {
       events: [...s.events, { type: 'hint_used', at: Date.now() }],
     }));
     setChatOpen(true);
-    void askTeamlead(teamleadHint(profession, before));
+    void askTeamlead(teamleadHint(profession, before), sessionId);
   };
 
   const submit = (result: CheckResult, answer: unknown) => {
@@ -74,7 +74,7 @@ export default function Workspace() {
 
       {/* Десктоп: чат справа. Мобильный: выезжает снизу. */}
       <aside
-        className={`fixed inset-x-0 bottom-0 z-30 h-[75dvh] rounded-t-2xl border border-slate-200 bg-white shadow-2xl transition-transform duration-300 lg:sticky lg:top-24 lg:z-0 lg:h-[calc(100dvh-8rem)] lg:translate-y-0 lg:rounded-2xl lg:shadow-none ${
+        className={`fixed inset-x-0 bottom-0 z-30 h-[75dvh] max-h-[85dvh] rounded-t-2xl border border-slate-200 bg-white pb-[env(safe-area-inset-bottom)] shadow-2xl transition-transform duration-300 lg:sticky lg:top-24 lg:z-0 lg:h-[calc(100dvh-8rem)] lg:translate-y-0 lg:rounded-2xl lg:pb-0 lg:shadow-none ${
           chatOpen ? 'translate-y-0' : 'translate-y-full'
         }`}
       >

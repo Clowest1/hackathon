@@ -24,8 +24,8 @@ export function TeamleadChat({ messages, onSend, onHint, typing }: Props) {
   };
 
   return (
-    <div className="flex h-full flex-col">
-      <div className="flex items-center gap-3 border-b border-slate-200 px-4 py-3">
+    <div className="flex h-full min-h-0 flex-col">
+      <div className="flex shrink-0 items-center gap-3 border-b border-slate-200 px-4 py-3">
         <div className="flex h-9 w-9 items-center justify-center rounded-full bg-indigo-100 font-semibold text-indigo-700">А</div>
         <div>
           <div className="font-semibold leading-tight">Аня</div>
@@ -33,7 +33,7 @@ export function TeamleadChat({ messages, onSend, onHint, typing }: Props) {
         </div>
       </div>
 
-      <div className="flex-1 space-y-3 overflow-y-auto p-4">
+      <div className="min-h-0 flex-1 space-y-3 overflow-y-auto p-4">
         {messages.map((m, i) => (
           <div key={i} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
             <div
@@ -49,7 +49,7 @@ export function TeamleadChat({ messages, onSend, onHint, typing }: Props) {
         <div ref={bottom} />
       </div>
 
-      <div className="border-t border-slate-200 p-3">
+      <div className="shrink-0 border-t border-slate-200 p-3">
         <button
           onClick={onHint}
           disabled={typing}
