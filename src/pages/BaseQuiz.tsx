@@ -1,8 +1,12 @@
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button, Card, Page } from '../components/ui';
 import { getProfession } from '../professions';
 import { useSession } from '../state/SessionContext';
 import type { Level } from '../types';
+
+const levelTitles: Record<Level, string> = { novice: 'Новичок', basic: 'Есть база' };
+const otherLevel: Record<Level, Level> = { novice: 'basic', basic: 'novice' };
 
 export default function BaseQuiz() {
   const navigate = useNavigate();
@@ -10,13 +14,15 @@ export default function BaseQuiz() {
   const profession = getProfession(session.professionId)!;
   const answers = session.baseAnswers;
   const done = profession.baseQuestions.every((q) => q.id in answers);
+  const [override, setOverride] = useState<Level | null>(null);
+
+  // Уровень считает код по баллам, без LLM; пользователь может выбрать другой вручную
+  const total = Object.values(answers).reduce((a, b) => a + b, 0);
+  const computed: Level = total >= profession.levelThreshold ? 'basic' : 'novice';
+  const level = override ?? computed;
 
   const finish = () => {
-    const total = Object.values(answers).reduce((a, b) => a + b, 0);
-    const computed: Level = total >= profession.levelThreshold ? 'basic' : 'novice';
-    // MVP: уровень basic ещё не реализован — всегда novice
-    void computed;
-    update({ level: 'novice' });
+    update({ level });
     navigate('/work');
   };
 
@@ -45,7 +51,21 @@ export default function BaseQuiz() {
           </Card>
         ))}
       </div>
-      <Button className="mt-8 w-full" disabled={!done} onClick={finish}>
+
+      {done && (
+        <Card className="mt-6 border-indigo-200 bg-indigo-50/60">
+          <p className="text-sm text-slate-600">
+            Твой уровень: <b className="text-indigo-700">{levelTitles[level]}</b>
+            {override && <span className="text-slate-500"> (выбран вручную)</span>}
+          </p>
+          {profession.levelDescriptions && <p className="mt-1 text-sm text-slate-700">{profession.levelDescriptions[level]}</p>}
+          <button onClick={() => setOverride(otherLevel[level] === computed ? null : otherLevel[level])} className="mt-2 text-sm font-medium text-indigo-600 hover:underline">
+            Хочу уровень «{levelTitles[otherLevel[level]]}»
+          </button>
+        </Card>
+      )}
+
+      <Button className="mt-6 w-full" disabled={!done} onClick={finish}>
         К задаче
       </Button>
     </Page>
