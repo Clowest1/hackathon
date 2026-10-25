@@ -15,19 +15,20 @@ export default function Result() {
   const navigate = useNavigate();
   const { session, update } = useSession();
   const result = session.result!;
+  const profession = getProfession(session.professionId)!;
   const feedback = session.feedback;
   const requested = useRef(false);
 
   useEffect(() => {
     if (feedback || requested.current) return;
     requested.current = true;
-    generateFeedback(getProfession(session.professionId)!, session).then((text) => update({ feedback: text }));
-  }, [feedback, session, update]);
+    generateFeedback(profession, session).then((text) => update({ feedback: text }));
+  }, [feedback, profession, session, update]);
 
   return (
     <Page
       title={result.passed ? 'Задача решена 🎉' : 'Почти получилось'}
-      subtitle={result.passed ? 'Ты нашёл(ла) причину — так выглядит реальная работа аналитика.' : 'Причина оказалась в другом, но путь ты прошёл(ла).'}
+      subtitle={result.passed ? `Так выглядит реальная работа: ${profession.title.toLowerCase()} решает такие задачи каждый день.` : 'Не всё сошлось, но рабочую задачу ты прошёл(ла) от начала до конца.'}
     >
       <div className="grid grid-cols-3 gap-3">
         <Card className="text-center">

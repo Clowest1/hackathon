@@ -29,6 +29,7 @@ export interface Profession {
   levelThreshold: number;          // сумма баллов >= порога → 'basic'
   task: {
     title: string;
+    summary: string;               // 1–2 предложения над рабочей средой: что случилось и что сделать
     briefing: string;              // первое сообщение тимлида: контекст и задача
     goal: string;                  // что считается успехом (для промпта тимлида)
     glossary: { term: string; explanation: string }[]; // термины, которые тимлид объясняет по ходу

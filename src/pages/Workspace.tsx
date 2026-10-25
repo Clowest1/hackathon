@@ -67,10 +67,7 @@ export default function Workspace() {
         <div className="mb-5">
           <p className="text-sm font-medium text-indigo-600">{profession.title} · задача</p>
           <h1 className="text-2xl font-bold tracking-tight">{task.title}</h1>
-          <p className="mt-2 text-slate-600">
-            С 15 октября выручка интернет-магазина упала на ~30%. В таблице <code className="rounded bg-slate-100 px-1">orders</code> —
-            все заказы. Найди причину и объясни её тимлиду.
-          </p>
+          <p className="mt-2 text-slate-600">{task.summary}</p>
         </div>
         <Environment level={session.level!} onEvent={logEvent} onSubmit={submit} />
       </div>
