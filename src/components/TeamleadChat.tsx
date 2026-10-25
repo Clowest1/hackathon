@@ -10,10 +10,11 @@ interface Props {
 
 export function TeamleadChat({ messages, onSend, onHint, typing }: Props) {
   const [text, setText] = useState('');
-  const bottom = useRef<HTMLDivElement>(null);
+  const list = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    bottom.current?.scrollIntoView({ behavior: 'smooth' });
+    // Прокручиваем только ленту чата: scrollIntoView двигал бы и всю страницу, и задача уезжала под шапку
+    list.current?.scrollTo({ top: list.current.scrollHeight, behavior: 'smooth' });
   }, [messages.length, typing]);
 
   const send = (e: React.FormEvent) => {
@@ -33,7 +34,7 @@ export function TeamleadChat({ messages, onSend, onHint, typing }: Props) {
         </div>
       </div>
 
-      <div className="min-h-0 flex-1 space-y-3 overflow-y-auto p-4">
+      <div ref={list} className="min-h-0 flex-1 space-y-3 overflow-y-auto p-4">
         {messages.map((m, i) => (
           <div key={i} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
             <div
@@ -46,7 +47,6 @@ export function TeamleadChat({ messages, onSend, onHint, typing }: Props) {
           </div>
         ))}
         {typing && <div className="text-xs text-slate-400">Аня печатает…</div>}
-        <div ref={bottom} />
       </div>
 
       <div className="shrink-0 border-t border-slate-200 p-3">

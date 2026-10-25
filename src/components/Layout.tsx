@@ -21,10 +21,11 @@ export function Layout() {
 
   return (
     <div className="flex min-h-dvh flex-col">
+      {pathname !== '/' && (
       <header className="sticky top-0 z-20 border-b border-slate-200 bg-white/90 backdrop-blur">
         <div className="mx-auto flex max-w-6xl items-center gap-6 px-4 py-3">
-          <Link to="/" className="shrink-0 text-lg font-bold tracking-tight">
-            Пробный <span className="text-indigo-600">день</span>
+          <Link to="/" className="shrink-0 text-[28px]" aria-label="RMIT — на главную">
+            <span className="rmit-mark">RMIT</span>
           </Link>
           {current >= 0 && (
             <div className="flex-1">
@@ -46,6 +47,7 @@ export function Layout() {
           )}
         </div>
       </header>
+      )}
       <main className="flex-1">
         <Outlet />
       </main>

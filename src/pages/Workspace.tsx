@@ -75,10 +75,11 @@ export default function Workspace() {
   return (
     <div className="mx-auto grid max-w-6xl gap-6 px-4 py-6 lg:grid-cols-[1fr_380px]">
       <div className="min-w-0">
-        <div className="mb-5">
-          <p className="text-sm font-medium text-indigo-600">{profession.title} · задача</p>
-          <h1 className="text-2xl font-bold tracking-tight">{task.title}</h1>
-          <p className="mt-2 text-slate-600">{task.summary}</p>
+        {/* Тёмная полоса задачи — рабочее пространство визуально отделено от остального сайта */}
+        <div className="mb-5 rounded-2xl bg-ink p-5 text-white shadow-sm sm:p-6">
+          <p className="text-xs font-semibold uppercase tracking-[0.12em] text-lavender">{profession.title} · рабочая задача</p>
+          <h1 className="mt-1.5 text-2xl font-bold tracking-tight">{task.title}</h1>
+          <p className="mt-2 max-w-2xl text-sm leading-relaxed text-white/80">{task.summary}</p>
         </div>
         <Environment level={session.level!} onEvent={logEvent} onSubmit={submit} />
       </div>
