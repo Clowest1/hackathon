@@ -38,6 +38,11 @@ export function BuggyShop() {
 
   const total = Math.max(0, initialSubtotal - discount) + 300;
 
+  // Баг negative-quantity: «−» не останавливается на единице. Сверху — разумный предел, чтобы не уйти в тысячи
+  const changeQuantity = (id: string, delta: number) =>
+    setQuantities((current) => ({ ...current, [id]: Math.min(99, current[id] + delta) }));
+  const stepButton = 'flex h-8 w-8 items-center justify-center rounded-lg border border-slate-300 bg-white text-base font-semibold text-slate-700 hover:bg-slate-50 active:bg-slate-100';
+
   return (
     <div className="mx-auto max-w-2xl overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
       <Zone id="header" label="Заголовок страницы" className="border-b border-slate-100 px-4 py-4 sm:px-6">
@@ -53,17 +58,12 @@ export function BuggyShop() {
               <p className="text-sm text-slate-500">{money(item.price)} за шт.</p>
             </Zone>
             <Zone id={`qty-${item.id}`} label={`Количество: «${item.name}»`} bugs={['negative-quantity']} className="p-1">
-              <label className="flex items-center gap-2 text-sm text-slate-600">
-                Кол-во
-                <input
-                  aria-label={`Количество: ${item.name}`}
-                  type="number"
-                  min="1"
-                  value={quantities[item.id]}
-                  onChange={(event) => setQuantities((current) => ({ ...current, [item.id]: Number(event.target.value) }))}
-                  className="w-20 rounded-lg border border-slate-300 px-2 py-2 text-center text-slate-900"
-                />
-              </label>
+              <div className="flex items-center gap-1.5 text-sm text-slate-600">
+                <span className="mr-1">Кол-во</span>
+                <button type="button" aria-label={`Уменьшить количество: ${item.name}`} onClick={() => changeQuantity(item.id, -1)} className={stepButton}>−</button>
+                <span aria-live="polite" className="w-8 text-center font-semibold tabular-nums text-slate-900">{quantities[item.id]}</span>
+                <button type="button" aria-label={`Увеличить количество: ${item.name}`} onClick={() => changeQuantity(item.id, 1)} className={stepButton}>+</button>
+              </div>
             </Zone>
           </div>
         ))}

@@ -2,7 +2,7 @@ import type { CheckResult } from '../../types';
 
 export const qaBugChecks = [
   { id: 'stale-total', label: 'Сумма корзины не пересчитывается при изменении количества' },
-  { id: 'negative-quantity', label: 'Можно указать отрицательное количество товара' },
+  { id: 'negative-quantity', label: 'Количество товара уходит в ноль и ниже' },
   { id: 'empty-email', label: 'Кнопка «Оформить» активна при пустом email' },
   { id: 'double-promo', label: 'Промокод применяется повторно при каждом нажатии' },
   { id: 'delivery-total', label: 'Доставка показана как 0 ₽, но в итог добавлено 300 ₽' },
