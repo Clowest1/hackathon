@@ -7,15 +7,16 @@ import { useSession } from '../state/SessionContext';
 
 export default function Roadmap() {
   const navigate = useNavigate();
-  const { session, update, reset } = useSession();
+  const { session, sessionId, updateForSession, reset } = useSession();
 
   const requested = useRef(false);
 
   useEffect(() => {
     if (session.roadmap || requested.current) return;
     requested.current = true;
-    generateRoadmap(getProfession(session.professionId)!, session).then((roadmap) => update({ roadmap }));
-  }, [session, update]);
+    const requestSessionId = sessionId;
+    generateRoadmap(getProfession(session.professionId)!, session).then((roadmap) => updateForSession(requestSessionId, { roadmap }));
+  }, [session, sessionId, updateForSession]);
 
   const roadmap = session.roadmap;
   if (!roadmap) return <Page title="Собираем твой план…"><p className="text-slate-500">Смотрим, что ты делал(а) в задаче, — это займёт несколько секунд.</p></Page>;

@@ -13,7 +13,7 @@ function formatDuration(ms: number) {
 
 export default function Result() {
   const navigate = useNavigate();
-  const { session, update } = useSession();
+  const { session, sessionId, updateForSession } = useSession();
   const result = session.result!;
   const profession = getProfession(session.professionId)!;
   const feedback = session.feedback;
@@ -22,8 +22,9 @@ export default function Result() {
   useEffect(() => {
     if (feedback || requested.current) return;
     requested.current = true;
-    generateFeedback(profession, session).then((text) => update({ feedback: text }));
-  }, [feedback, profession, session, update]);
+    const requestSessionId = sessionId;
+    generateFeedback(profession, session).then((text) => updateForSession(requestSessionId, { feedback: text }));
+  }, [feedback, profession, session, sessionId, updateForSession]);
 
   return (
     <Page
