@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { generateRoadmap } from '../ai/roadmap';
-import { buildSkills, planExtras } from '../ai/roadmapPlan';
+import { buildSkills, planExtras, resourceLink } from '../ai/roadmapPlan';
 import { Button, Card, Page } from '../components/ui';
 import { getProfession, professionCards } from '../professions';
 import { useSession } from '../state/SessionContext';
@@ -172,9 +172,22 @@ export default function Roadmap() {
               </ul>
 
               <div className="mt-3 flex flex-wrap gap-1.5">
-                {w.resources.map((r) => (
-                  <span key={r} className="rounded-full border border-slate-200 bg-slate-50 px-2.5 py-0.5 text-xs text-slate-600">📘 {r}</span>
-                ))}
+                {w.resources.map((r) => {
+                  const href = resourceLink(r);
+                  return href ? (
+                    <a
+                      key={r}
+                      href={href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="rounded-full border border-indigo-200 bg-white px-2.5 py-0.5 text-xs font-medium text-indigo-700 transition hover:border-indigo-400 hover:bg-indigo-50"
+                    >
+                      📘 {r} ↗
+                    </a>
+                  ) : (
+                    <span key={r} className="rounded-full border border-slate-200 bg-slate-50 px-2.5 py-0.5 text-xs text-slate-600">📘 {r}</span>
+                  );
+                })}
               </div>
 
               {w.why && w.why.length > 0 && (

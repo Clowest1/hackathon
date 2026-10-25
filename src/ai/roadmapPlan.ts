@@ -76,6 +76,29 @@ const TEMPLATES: Record<ProfessionId, WeekDraft[]> = {
   ],
 };
 
+/** Ссылки на ресурсы из шаблонов (все проверены: открываются, бесплатные). */
+const RESOURCE_LINKS: Record<string, string> = {
+  'SQLBolt (sqlbolt.com)': 'https://sqlbolt.com/',
+  'Stepik: «Интерактивный тренажёр по SQL»': 'https://stepik.org/course/63054',
+  'Kaggle Learn: Intro to SQL': 'https://www.kaggle.com/learn/intro-to-sql',
+  'Mode: SQL Tutorial': 'https://mode.com/sql-tutorial/',
+  'Справка Google Таблиц: сводные таблицы и диаграммы': 'https://support.google.com/docs/answer/1272900?hl=ru',
+  'Kaggle Datasets': 'https://www.kaggle.com/datasets',
+  'Силлабус ISTQB Foundation Level (бесплатный)': 'https://www.istqb.org/certifications/certified-tester-foundation-level',
+  'Глоссарий ISTQB (glossary.istqb.org)': 'https://glossary.istqb.org/',
+  'Документация Atlassian Jira: работа с задачами': 'https://support.atlassian.com/jira-software-cloud/docs/what-is-an-issue/',
+  'Документация Chrome DevTools': 'https://developer.chrome.com/docs/devtools',
+  'Postman Learning Center': 'https://learning.postman.com/',
+  'MDN Web Docs: веб-формы': 'https://developer.mozilla.org/ru/docs/Learn_web_development/Extensions/Forms',
+  'MDN Web Docs: «Изучение веб-разработки»': 'https://developer.mozilla.org/ru/docs/Learn_web_development',
+  'Flexbox Froggy': 'https://flexboxfroggy.com/#ru',
+  'CSS Grid Garden': 'https://cssgridgarden.com/#ru',
+  'Документация Chrome DevTools: панель Elements': 'https://developer.chrome.com/docs/devtools/css',
+  'learn.javascript.ru': 'https://learn.javascript.ru/',
+};
+
+export const resourceLink = (name: string): string | undefined => RESOURCE_LINKS[name];
+
 /** Цель и примерная нагрузка каждой недели — по профессиям, в порядке недель. */
 const WEEK_META: Record<ProfessionId, { goal: string; hours: number }[]> = {
   analyst: [
