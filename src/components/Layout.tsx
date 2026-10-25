@@ -11,7 +11,7 @@ export const steps = [
 
 export function Layout() {
   const { pathname } = useLocation();
-  const current = steps.findIndex((s) => s.path === pathname);
+  const current = steps.findIndex((s) => s.path === (pathname === '/recommend' ? '/choose' : pathname));
 
   return (
     <div className="flex min-h-dvh flex-col">

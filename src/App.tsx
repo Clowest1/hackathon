@@ -5,6 +5,7 @@ import { SessionProvider, useSession } from './state/SessionContext';
 import type { Session } from './types';
 import Landing from './pages/Landing';
 import ChooseProfession from './pages/ChooseProfession';
+import Recommend from './pages/Recommend';
 import BaseQuiz from './pages/BaseQuiz';
 import Workspace from './pages/Workspace';
 import Result from './pages/Result';
@@ -25,6 +26,7 @@ export default function App() {
           <Route element={<Layout />}>
             <Route path="/" element={<Landing />} />
             <Route path="/choose" element={<ChooseProfession />} />
+            <Route path="/recommend" element={<Recommend />} />
             <Route path="/quiz" element={<Guard need={(s) => !!s.professionId} to="/choose"><BaseQuiz /></Guard>} />
             <Route path="/work" element={<Guard need={(s) => !!s.level} to="/quiz"><Workspace /></Guard>} />
             <Route path="/result" element={<Guard need={(s) => !!s.result} to="/work"><Result /></Guard>} />
