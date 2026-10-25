@@ -27,6 +27,7 @@ export interface Profession {
   shortDescription: string;
   baseQuestions: BaseQuestion[];
   levelThreshold: number;          // сумма баллов >= порога → 'basic'
+  levelDescriptions?: Record<Level, string>; // что меняется в задаче на этом уровне — показываем после анкеты
   task: {
     title: string;
     summary: string;               // 1–2 предложения над рабочей средой: что случилось и что сделать
