@@ -1,7 +1,8 @@
 import type { Profession, ProfessionCard, ProfessionId } from '../types';
 import { analyst } from './analyst/config';
+import { qa } from './qa/config';
 
-export const professions: Profession[] = [analyst];
+export const professions: Profession[] = [analyst, qa];
 
 export const professionCards: ProfessionCard[] = [
   { id: 'analyst', title: analyst.title, shortDescription: analyst.shortDescription, available: true },
@@ -9,7 +10,7 @@ export const professionCards: ProfessionCard[] = [
     id: 'qa',
     title: 'Тестировщик',
     shortDescription: 'Ищет ошибки до того, как их найдут пользователи. Проверяет, ломает, пишет баг-репорты.',
-    available: false,
+    available: true,
   },
   {
     id: 'frontend',
