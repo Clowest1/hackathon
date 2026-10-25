@@ -8,6 +8,6 @@ export function generateFeedback(profession: Profession, session: Session): Prom
   return withFallback(
     'feedback',
     (signal) => chat(feedbackMessages(profession, session), { signal, temperature: 0.6 }),
-    () => fallbacks.feedback(session.result!, session),
+    () => fallbacks.feedback(session),
   );
 }
