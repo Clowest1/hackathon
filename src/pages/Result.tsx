@@ -1,6 +1,8 @@
+import { useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import * as fallbacks from '../ai/fallbacks';
+import { generateFeedback } from '../ai/feedback';
 import { Button, Card, Page } from '../components/ui';
+import { getProfession } from '../professions';
 import { useSession } from '../state/SessionContext';
 
 function formatDuration(ms: number) {
@@ -11,10 +13,16 @@ function formatDuration(ms: number) {
 
 export default function Result() {
   const navigate = useNavigate();
-  const { session } = useSession();
+  const { session, update } = useSession();
   const result = session.result!;
-  // TODO: заменить на ai/feedback.ts
-  const feedback = fallbacks.feedback(result, session);
+  const feedback = session.feedback;
+  const requested = useRef(false);
+
+  useEffect(() => {
+    if (feedback || requested.current) return;
+    requested.current = true;
+    generateFeedback(getProfession(session.professionId)!, session).then((text) => update({ feedback: text }));
+  }, [feedback, session, update]);
 
   return (
     <Page
@@ -53,7 +61,7 @@ export default function Result() {
           <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-indigo-100 font-semibold text-indigo-700">А</div>
           <div>
             <div className="text-sm font-semibold">Фидбек тимлида</div>
-            <p className="mt-1 text-sm text-slate-700">{feedback}</p>
+            <p className="mt-1 text-sm text-slate-700">{feedback ?? <span className="text-slate-400">Аня пишет фидбек…</span>}</p>
           </div>
         </div>
       </Card>

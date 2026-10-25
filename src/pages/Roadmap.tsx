@@ -1,21 +1,24 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import * as fallbacks from '../ai/fallbacks';
+import { generateRoadmap } from '../ai/roadmap';
 import { Button, Card, Page } from '../components/ui';
-import { professionCards } from '../professions';
+import { getProfession, professionCards } from '../professions';
 import { useSession } from '../state/SessionContext';
 
 export default function Roadmap() {
   const navigate = useNavigate();
   const { session, update, reset } = useSession();
 
-  // TODO: заменить на ai/roadmap.ts
+  const requested = useRef(false);
+
   useEffect(() => {
-    if (!session.roadmap) update((s) => ({ roadmap: fallbacks.roadmap(s) }));
-  }, [session.roadmap, update]);
+    if (session.roadmap || requested.current) return;
+    requested.current = true;
+    generateRoadmap(getProfession(session.professionId)!, session).then((roadmap) => update({ roadmap }));
+  }, [session, update]);
 
   const roadmap = session.roadmap;
-  if (!roadmap) return <Page title="Собираем твой план…"><p className="text-slate-500">Секунду.</p></Page>;
+  if (!roadmap) return <Page title="Собираем твой план…"><p className="text-slate-500">Смотрим, что ты делал(а) в задаче, — это займёт несколько секунд.</p></Page>;
 
   const next = professionCards.find((p) => p.id === roadmap.nextProfessionToTry);
 
@@ -48,7 +51,7 @@ export default function Roadmap() {
       {next && (
         <Card className="mt-6 border-indigo-200 bg-indigo-50">
           <p className="text-sm">
-            Кажется, аналитика — не совсем твоё, и это ценный вывод. Попробуй профессию «{next.title}» — она скоро появится.
+            Похоже, эта профессия — не совсем твоё, и это ценный вывод. Попробуй профессию «{next.title}» — она скоро появится.
           </p>
         </Card>
       )}

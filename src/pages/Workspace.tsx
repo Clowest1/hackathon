@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { TeamleadChat } from '../components/TeamleadChat';
-import * as fallbacks from '../ai/fallbacks';
+import { teamleadHint, teamleadReply } from '../ai/teamlead';
 import { getProfession } from '../professions';
 import { useSession } from '../state/SessionContext';
 import type { CheckResult, SessionEvent } from '../types';
@@ -12,7 +12,7 @@ export default function Workspace() {
   const profession = getProfession(session.professionId)!;
   const { Environment, task } = profession;
   const [chatOpen, setChatOpen] = useState(false);
-  const [typing, setTyping] = useState(false);
+  const [pending, setPending] = useState(0); // сколько ответов тимлида ещё ждём
 
   // Старт задачи: брифинг тимлида и таймер (один раз за сессию)
   useEffect(() => {
@@ -23,30 +23,41 @@ export default function Workspace() {
 
   const logEvent = (e: SessionEvent) => update((s) => ({ events: [...s.events, e] }));
 
-  // TODO: заменить на ai/teamlead.ts
+  // Ответ тимлида приходит асинхронно (LLM или фолбэк) — дописываем его к актуальному чату.
+  const askTeamlead = async (request: Promise<string>) => {
+    setPending((n) => n + 1);
+    try {
+      const text = await request;
+      update((s) => ({ chat: [...s.chat, { role: 'teamlead', text }] }));
+    } finally {
+      setPending((n) => n - 1);
+    }
+  };
+
   const sendMessage = (text: string) => {
-    update((s) => ({
-      chat: [...s.chat, { role: 'user', text }],
-      events: [...s.events, { type: 'chat_message', at: Date.now(), payload: text }],
-    }));
-    setTyping(true);
-    setTimeout(() => {
-      update((s) => ({ chat: [...s.chat, { role: 'teamlead', text: fallbacks.teamleadReply(s) }] }));
-      setTyping(false);
-    }, 700);
+    const now = Date.now();
+    const next = {
+      ...session,
+      chat: [...session.chat, { role: 'user' as const, text }],
+      events: [...session.events, { type: 'chat_message' as const, at: now, payload: text }],
+    };
+    update({ chat: next.chat, events: next.events });
+    void askTeamlead(teamleadReply(profession, next));
   };
 
   const hint = () => {
+    const before = { ...session, chat: [...session.chat, { role: 'user' as const, text: 'Дай подсказку' }] };
     update((s) => ({
-      chat: [...s.chat, { role: 'user', text: 'Дай подсказку' }, { role: 'teamlead', text: fallbacks.hintMessage(profession, s) }],
+      chat: [...s.chat, { role: 'user', text: 'Дай подсказку' }],
       hintsUsed: s.hintsUsed + 1,
       events: [...s.events, { type: 'hint_used', at: Date.now() }],
     }));
     setChatOpen(true);
+    void askTeamlead(teamleadHint(profession, before));
   };
 
   const submit = (result: CheckResult, answer: unknown) => {
-    update({ result, answer, finishedAt: Date.now() });
+    update({ result, answer, finishedAt: Date.now(), feedback: undefined, roadmap: undefined });
     navigate('/result');
   };
 
@@ -73,7 +84,7 @@ export default function Workspace() {
         <button onClick={() => setChatOpen(false)} className="absolute top-3 right-3 text-slate-400 lg:hidden" aria-label="Закрыть чат">
           ✕
         </button>
-        <TeamleadChat messages={session.chat} onSend={sendMessage} onHint={hint} typing={typing} />
+        <TeamleadChat messages={session.chat} onSend={sendMessage} onHint={hint} typing={pending > 0} />
       </aside>
 
       {!chatOpen && (

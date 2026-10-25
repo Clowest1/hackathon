@@ -52,7 +52,8 @@ export function TeamleadChat({ messages, onSend, onHint, typing }: Props) {
       <div className="border-t border-slate-200 p-3">
         <button
           onClick={onHint}
-          className="mb-2 w-full rounded-lg border border-indigo-200 bg-indigo-50 py-1.5 text-sm font-medium text-indigo-700 hover:bg-indigo-100"
+          disabled={typing}
+          className="mb-2 w-full rounded-lg border border-indigo-200 bg-indigo-50 py-1.5 text-sm font-medium text-indigo-700 hover:bg-indigo-100 disabled:cursor-wait disabled:opacity-50"
         >
           💡 Подсказка
         </button>

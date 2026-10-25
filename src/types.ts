@@ -66,6 +66,7 @@ export interface Session {
   chat: ChatMessage[];
   result?: CheckResult;
   answer?: unknown;                // ответ пользователя при сдаче (для фидбека)
+  feedback?: string;               // фидбек тимлида после сдачи (кешируем, чтобы не звать LLM повторно)
   reflection?: Record<string, string>;
   roadmap?: Roadmap;
 }
