@@ -76,8 +76,8 @@ const TEMPLATES: Record<ProfessionId, WeekDraft[]> = {
   ],
 };
 
-/** Если профессия «не зашла» — что предложить попробовать дальше. */
-const NEXT_PROFESSION: Record<ProfessionId, ProfessionId> = { analyst: 'qa', qa: 'frontend', frontend: 'analyst' };
+/** Если профессия «не зашла» — что предложить дальше, по порядку предпочтения (берём первую доступную). */
+const NEXT_PROFESSION: Record<ProfessionId, ProfessionId[]> = { analyst: ['qa', 'frontend'], qa: ['frontend', 'analyst'], frontend: ['analyst', 'qa'] };
 const NEGATIVE_DAILY = ['Скорее нет', 'Нет'];
 
 const MAX_TASKS = 4;
@@ -89,7 +89,8 @@ function addTask(week: WeekDraft, task: string, first = false) {
 }
 
 export function nextProfession(profession: Profession, session: Session): ProfessionId | undefined {
-  return NEGATIVE_DAILY.includes(session.reflection?.daily ?? '') ? NEXT_PROFESSION[profession.id] : undefined;
+  if (!NEGATIVE_DAILY.includes(session.reflection?.daily ?? '')) return undefined;
+  return NEXT_PROFESSION[profession.id].find((id) => professionCards.some((p) => p.id === id && p.available));
 }
 
 /** Недели плана: шаблон профессии + задания, привязанные к тому, что было в пробном дне. */

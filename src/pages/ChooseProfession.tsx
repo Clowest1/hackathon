@@ -29,6 +29,16 @@ export default function ChooseProfession() {
           </button>
         ))}
       </div>
+      <button
+        onClick={() => navigate('/recommend')}
+        className="mt-4 flex w-full items-center justify-between gap-3 rounded-2xl border border-dashed border-slate-300 bg-white/60 p-5 text-left transition hover:border-indigo-400 hover:bg-white"
+      >
+        <span>
+          <span className="block font-semibold">Не знаю, что выбрать</span>
+          <span className="mt-1 block text-sm text-slate-600">Ответь на 4 вопроса о своих интересах — подскажем, с чего начать.</span>
+        </span>
+        <span className="text-sm font-medium text-indigo-600">Подобрать →</span>
+      </button>
     </Page>
   );
 }

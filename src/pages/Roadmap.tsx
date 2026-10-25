@@ -4,10 +4,11 @@ import { generateRoadmap } from '../ai/roadmap';
 import { Button, Card, Page } from '../components/ui';
 import { getProfession, professionCards } from '../professions';
 import { useSession } from '../state/SessionContext';
+import type { ProfessionId } from '../types';
 
 export default function Roadmap() {
   const navigate = useNavigate();
-  const { session, sessionId, updateForSession, reset } = useSession();
+  const { session, sessionId, update, updateForSession, reset } = useSession();
 
   const requested = useRef(false);
 
@@ -21,7 +22,18 @@ export default function Roadmap() {
   const roadmap = session.roadmap;
   if (!roadmap) return <Page title="Собираем твой план…"><p className="text-slate-500">Смотрим, что ты делал(а) в задаче, — это займёт несколько секунд.</p></Page>;
 
-  const next = professionCards.find((p) => p.id === roadmap.nextProfessionToTry);
+  // Предлагаем только то, что уже можно пройти (старый сохранённый роадмап мог советовать «скоро»)
+  const next = professionCards.find((p) => p.id === roadmap.nextProfessionToTry && p.available);
+
+  const startOver = (professionId?: ProfessionId) => {
+    reset();
+    if (professionId) {
+      update({ professionId });
+      navigate('/quiz');
+    } else {
+      navigate('/choose');
+    }
+  };
 
   return (
     <Page title="Твой план на 4 недели" subtitle={roadmap.summary}>
@@ -52,20 +64,25 @@ export default function Roadmap() {
       {next && (
         <Card className="mt-6 border-indigo-200 bg-indigo-50">
           <p className="text-sm">
-            Похоже, эта профессия — не совсем твоё, и это ценный вывод. Попробуй профессию «{next.title}» — она скоро появится.
+            Похоже, эта профессия — не совсем твоё, и это ценный вывод. Попробуй профессию «{next.title}»: {next.shortDescription.charAt(0).toLowerCase() + next.shortDescription.slice(1)}
           </p>
         </Card>
       )}
 
-      <Button
-        className="mt-8 w-full"
-        onClick={() => {
-          reset();
-          navigate('/choose');
-        }}
-      >
-        Попробовать другую профессию
-      </Button>
+      {next ? (
+        <>
+          <Button className="mt-8 w-full" onClick={() => startOver(next.id)}>
+            Попробовать «{next.title}»
+          </Button>
+          <button onClick={() => startOver()} className="mt-3 w-full text-sm font-medium text-indigo-600 hover:underline">
+            Выбрать другую профессию
+          </button>
+        </>
+      ) : (
+        <Button className="mt-8 w-full" onClick={() => startOver()}>
+          Попробовать другую профессию
+        </Button>
+      )}
     </Page>
   );
 }
