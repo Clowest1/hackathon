@@ -21,7 +21,8 @@ export function minutesSpent(session: Session) {
 /** Ответ в чате, если LLM недоступен: термин из словаря, если он есть в вопросе, иначе общий наводящий ответ. */
 export function teamleadReply(profession: Profession, session: Session): string {
   const last = session.chat.at(-1)?.text.toLowerCase() ?? '';
-  const term = profession.task.glossary.find((g) => last.includes(g.term.toLowerCase()));
+  // самый длинный подходящий термин: «баг-репорт» важнее, чем «баг»
+  const term = [...profession.task.glossary].sort((a, b) => b.term.length - a.term.length).find((g) => last.includes(g.term.toLowerCase()));
   if (term) return `${term.term.charAt(0).toUpperCase() + term.term.slice(1)} — ${lowerFirst(term.explanation)} Если ещё что-то непонятно — спрашивай.`;
 
   const replies = [

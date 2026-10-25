@@ -81,11 +81,11 @@ export function BuggyShop() {
           />
         </label>
 
-        <div className="space-y-2 rounded-xl bg-white p-3 text-sm">
-          <div data-bug-id="delivery-total" className="flex justify-between text-slate-600"><span>Доставка</span><span>0 ₽</span></div>
+        <div data-bug-id="delivery-total" className="space-y-2 rounded-xl bg-white p-3 text-sm">
+          <div className="flex justify-between text-slate-600"><span>Доставка</span><span>0 ₽</span></div>
           <div className="flex justify-between border-t border-slate-100 pt-2 font-semibold text-slate-900"><span>Итого</span><span>{money(total)}</span></div>
         </div>
-        <button type="button" className="w-full rounded-xl bg-indigo-600 px-4 py-3 font-semibold text-white hover:bg-indigo-700">
+        <button type="button" data-bug-id="empty-email" className="w-full rounded-xl bg-indigo-600 px-4 py-3 font-semibold text-white hover:bg-indigo-700">
           Оформить
         </button>
         <p className="text-center text-xs text-slate-500">Демо-корзина • данные заказа не отправляются</p>

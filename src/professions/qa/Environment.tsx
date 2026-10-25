@@ -1,21 +1,14 @@
-import { useEffect, useState, type MouseEvent } from 'react';
+import { useState, type MouseEvent } from 'react';
 import type { EnvironmentProps } from '../../types';
 import { BuggyShop } from './BuggyShop';
-import { checkQa, qaBugChecks, type QaBugReport } from './checker';
+import { checkQa, type QaBugReport } from './checker';
 
 export function Environment({ level, onEvent, onSubmit }: EnvironmentProps) {
   const [markMode, setMarkMode] = useState(false);
-  const [hintOfferVisible, setHintOfferVisible] = useState(false);
   const [hasPendingReport, setHasPendingReport] = useState(false);
   const [pendingBugId, setPendingBugId] = useState<string | null>(null);
   const [description, setDescription] = useState('');
   const [reports, setReports] = useState<QaBugReport[]>([]);
-
-  useEffect(() => {
-    if (level !== 'novice') return;
-    const timer = window.setTimeout(() => setHintOfferVisible(true), 3 * 60 * 1000);
-    return () => window.clearTimeout(timer);
-  }, [level]);
 
   const handleShopClick = (event: MouseEvent<HTMLDivElement>) => {
     if (!markMode) return;
@@ -28,7 +21,7 @@ export function Environment({ level, onEvent, onSubmit }: EnvironmentProps) {
   };
 
   const addReport = () => {
-    const report = { bugId: pendingBugId, description: description.trim() || 'Пользователь отметил этот участок страницы.' };
+    const report = { bugId: pendingBugId, description: description.trim() || 'Без описания' };
     setReports((current) => [...current, report]);
     onEvent({ type: 'bug_marked', at: Date.now(), payload: { bugId: report.bugId ?? 'unmapped', description: report.description } });
     setPendingBugId(null);
@@ -49,16 +42,6 @@ export function Environment({ level, onEvent, onSubmit }: EnvironmentProps) {
               <li key={item} className="flex gap-2"><span className="text-indigo-600">✓</span><span>{item}</span></li>
             ))}
           </ul>
-        </section>
-      )}
-
-      {hintOfferVisible && (
-        <section role="status" className="flex items-start justify-between gap-3 rounded-2xl border border-indigo-200 bg-indigo-50 p-4">
-          <div>
-            <p className="text-sm font-semibold text-indigo-950">Аня, тимлид</p>
-            <p className="mt-1 text-sm text-indigo-900">Уже несколько минут проверяешь корзину. Хочешь подсказку? Открой чат и нажми «Подсказка» — я подскажу следующий шаг.</p>
-          </div>
-          <button type="button" aria-label="Скрыть предложение подсказки" onClick={() => setHintOfferVisible(false)} className="rounded px-2 text-indigo-600 hover:bg-indigo-100">×</button>
         </section>
       )}
 
@@ -108,13 +91,12 @@ export function Environment({ level, onEvent, onSubmit }: EnvironmentProps) {
           <p className="mt-2 text-sm text-slate-500">Пока пусто. Включи разметку и выбери место на странице.</p>
         ) : (
           <ol className="mt-3 space-y-2">
-            {reports.map((report, index) => {
-              const known = qaBugChecks.find((bug) => bug.id === report.bugId);
-              return <li key={`${report.bugId ?? 'other'}-${index}`} className="rounded-lg bg-slate-50 p-3 text-sm">
-                <p className="font-medium text-slate-800">{index + 1}. {known?.label ?? 'Отмечено место без заложенного бага'}</p>
-                <p className="mt-1 text-slate-600">{report.description}</p>
-              </li>;
-            })}
+            {/* Только описание пользователя: какие отметки попали в заложенные баги, видно лишь после сдачи */}
+            {reports.map((report, index) => (
+              <li key={index} className="rounded-lg bg-slate-50 p-3 text-sm text-slate-700">
+                <span className="font-medium text-slate-800">{index + 1}.</span> {report.description}
+              </li>
+            ))}
           </ol>
         )}
         <button type="button" onClick={submit} className="mt-4 w-full rounded-xl bg-indigo-600 py-2.5 font-semibold text-white hover:bg-indigo-700">Сдать задачу</button>

@@ -112,6 +112,10 @@ export function buildWeeks(profession: Profession, session: Session): Roadmap['w
   if (hardest.includes('начать')) addTask(weeks[2], 'Составь себе чек-лист «с чего начинать задачу» и пользуйся им');
   if (hardest.includes('срез')) addTask(weeks[2], 'Перед каждым срезом записывай гипотезу: что ожидаешь увидеть и почему');
   if (hardest.includes('вывод')) addTask(weeks[3], 'Тренируй выводы: одно предложение + одна цифра, которая его доказывает');
+  if (hardest.includes('проверять')) addTask(weeks[0], 'Перед проверкой выписывай, что может сломаться: поля, кнопки, суммы, повторные действия');
+  if (hardest.includes('описать')) addTask(weeks[1], 'Опиши каждый найденный в задании баг заново: шаги → ожидаемый результат → фактический');
+  if (hardest.includes('воспроизвести')) addTask(weeks[1], 'Для каждого бага запиши минимальные шаги, после которых он повторяется');
+  if (hardest.includes('ожидаемого')) addTask(weeks[0], 'Прежде чем считать что-то багом, сформулируй ожидаемое поведение одной фразой');
 
   if (session.hintsUsed >= 3) addTask(weeks[3], 'Пройди задание пробного дня ещё раз — теперь без подсказок');
   else if (session.result?.passed && session.hintsUsed <= 1) addTask(weeks[3], 'Возьми задачу посложнее: у тебя хорошо получилось почти без подсказок');
