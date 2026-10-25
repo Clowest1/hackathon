@@ -16,7 +16,7 @@ export function Layout() {
   return (
     <div className="flex min-h-dvh flex-col">
       <header className="sticky top-0 z-20 border-b border-slate-200 bg-white/90 backdrop-blur">
-        <div className="mx-auto flex max-w-6xl items-center gap-6 px-4 py-3">
+        <div className="mx-auto flex max-w-6xl items-center gap-3 px-4 py-3 sm:gap-6">
           <Link to="/" className="shrink-0 text-lg font-bold tracking-tight">
             Пробный <span className="text-indigo-600">день</span>
           </Link>

@@ -8,7 +8,7 @@ import type { CheckResult, SessionEvent } from '../types';
 
 export default function Workspace() {
   const navigate = useNavigate();
-  const { session, update } = useSession();
+  const { session, update, updateForSession } = useSession();
   const profession = getProfession(session.professionId)!;
   const { Environment, task } = profession;
   const [chatOpen, setChatOpen] = useState(false);
@@ -25,13 +25,14 @@ export default function Workspace() {
 
   // TODO: заменить на ai/teamlead.ts
   const sendMessage = (text: string) => {
+    const requestSessionId = session.sessionId;
     update((s) => ({
       chat: [...s.chat, { role: 'user', text }],
       events: [...s.events, { type: 'chat_message', at: Date.now(), payload: text }],
     }));
     setTyping(true);
     setTimeout(() => {
-      update((s) => ({ chat: [...s.chat, { role: 'teamlead', text: fallbacks.teamleadReply(s) }] }));
+      updateForSession(requestSessionId, (s) => ({ chat: [...s.chat, { role: 'teamlead', text: fallbacks.teamleadReply(s) }] }));
       setTyping(false);
     }, 700);
   };
@@ -51,9 +52,9 @@ export default function Workspace() {
   };
 
   return (
-    <div className="mx-auto grid max-w-6xl gap-6 px-4 py-6 lg:grid-cols-[1fr_380px]">
+    <div className="mx-auto grid max-w-6xl min-w-0 gap-4 px-3 py-4 sm:gap-6 sm:px-4 sm:py-6 lg:grid-cols-[minmax(0,1fr)_380px]">
       <div className="min-w-0">
-        <div className="mb-5">
+        <div className="mb-5 min-w-0">
           <p className="text-sm font-medium text-indigo-600">{profession.title} · задача</p>
           <h1 className="text-2xl font-bold tracking-tight">{task.title}</h1>
           <p className="mt-2 text-slate-600">
@@ -66,7 +67,7 @@ export default function Workspace() {
 
       {/* Десктоп: чат справа. Мобильный: выезжает снизу. */}
       <aside
-        className={`fixed inset-x-0 bottom-0 z-30 h-[75dvh] rounded-t-2xl border border-slate-200 bg-white shadow-2xl transition-transform duration-300 lg:sticky lg:top-24 lg:z-0 lg:h-[calc(100dvh-8rem)] lg:translate-y-0 lg:rounded-2xl lg:shadow-none ${
+        className={`fixed inset-x-0 bottom-0 z-30 h-[min(75dvh,680px)] max-h-[calc(100dvh-1rem)] rounded-t-2xl border border-slate-200 bg-white pb-[env(safe-area-inset-bottom)] shadow-2xl transition-transform duration-300 lg:sticky lg:top-24 lg:z-0 lg:h-[calc(100dvh-8rem)] lg:translate-y-0 lg:rounded-2xl lg:shadow-none ${
           chatOpen ? 'translate-y-0' : 'translate-y-full'
         }`}
       >

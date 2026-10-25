@@ -56,6 +56,8 @@ export interface ChatMessage {
 }
 
 export interface Session {
+  /** Идентификатор прохода: отсекает отложенные ответы предыдущей сессии. */
+  sessionId: string;
   professionId?: ProfessionId;
   level?: Level;
   baseAnswers: Record<string, number>;

@@ -3,7 +3,10 @@ import type { Session } from '../types';
 
 const STORAGE_KEY = 'probny-den:session';
 
+const newSessionId = () => globalThis.crypto?.randomUUID?.() ?? `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+
 const emptySession = (): Session => ({
+  sessionId: newSessionId(),
   baseAnswers: {},
   events: [],
   hintsUsed: 0,
@@ -22,6 +25,7 @@ function load(): Session {
 interface SessionContextValue {
   session: Session;
   update: (patch: Partial<Session> | ((s: Session) => Partial<Session>)) => void;
+  updateForSession: (sessionId: string, patch: Partial<Session> | ((s: Session) => Partial<Session>)) => void;
   reset: () => void;
 }
 
@@ -42,9 +46,13 @@ export function SessionProvider({ children }: { children: ReactNode }) {
     setSession((s) => ({ ...s, ...(typeof patch === 'function' ? patch(s) : patch) }));
   }, []);
 
+  const updateForSession = useCallback<SessionContextValue['updateForSession']>((sessionId, patch) => {
+    setSession((s) => s.sessionId !== sessionId ? s : ({ ...s, ...(typeof patch === 'function' ? patch(s) : patch) }));
+  }, []);
+
   const reset = useCallback(() => setSession(emptySession()), []);
 
-  const value = useMemo(() => ({ session, update, reset }), [session, update, reset]);
+  const value = useMemo(() => ({ session, update, updateForSession, reset }), [session, update, updateForSession, reset]);
   return <SessionContext.Provider value={value}>{children}</SessionContext.Provider>;
 }
 
