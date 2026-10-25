@@ -62,8 +62,7 @@ export function useProactiveTeamlead(profession: Profession, session: Session, a
 
       lastNudgeAt.current = state.now;
       nudges.current += 1;
-      const idleMinutes = Math.max(1, Math.round((state.now - lastActivity) / 60_000));
-      ask(teamleadNudge(profession, session, idleMinutes, lastEvent?.type === 'error'));
+      ask(teamleadNudge(profession, session, lastEvent?.type === 'error', nudges.current - 1));
     }, CHECK_EVERY_MS);
 
     return () => {

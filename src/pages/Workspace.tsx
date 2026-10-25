@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { TeamleadChat } from '../components/TeamleadChat';
-import { teamleadHint, teamleadReply } from '../ai/teamlead';
+import { isHintRequest, teamleadHint, teamleadReply } from '../ai/teamlead';
 import { useProactiveTeamlead } from '../ai/useProactiveTeamlead';
 import { getProfession } from '../professions';
 import { useSession } from '../state/SessionContext';
@@ -44,6 +44,7 @@ export default function Workspace() {
   const unread = !chatOpen && session.chat.length > seenMessages;
 
   const sendMessage = (text: string) => {
+    if (isHintRequest(text)) return hint(text); // «дай подсказку» в чате — как кнопка: считается и идёт по порядку
     const now = Date.now();
     const next = {
       ...session,
@@ -54,16 +55,16 @@ export default function Workspace() {
     void askTeamlead(teamleadReply(profession, next));
   };
 
-  const hint = () => {
-    const before = { ...session, chat: [...session.chat, { role: 'user' as const, text: 'Дай подсказку' }] };
+  function hint(userText = 'Дай подсказку') {
+    const before = { ...session, chat: [...session.chat, { role: 'user' as const, text: userText }] };
     update((s) => ({
-      chat: [...s.chat, { role: 'user', text: 'Дай подсказку' }],
+      chat: [...s.chat, { role: 'user', text: userText }],
       hintsUsed: s.hintsUsed + 1,
       events: [...s.events, { type: 'hint_used', at: Date.now() }],
     }));
     setChatOpen(true);
     void askTeamlead(teamleadHint(profession, before));
-  };
+  }
 
   const submit = (result: CheckResult, answer: unknown) => {
     update({ result, answer, finishedAt: Date.now(), feedback: undefined, roadmap: undefined });
@@ -90,7 +91,7 @@ export default function Workspace() {
         <button onClick={() => setChatOpen(false)} className="absolute top-3 right-3 text-slate-400 lg:hidden" aria-label="Закрыть чат">
           ✕
         </button>
-        <TeamleadChat messages={session.chat} onSend={sendMessage} onHint={hint} typing={pending > 0} />
+        <TeamleadChat messages={session.chat} onSend={sendMessage} onHint={() => hint()} typing={pending > 0} />
       </aside>
 
       {!chatOpen && (

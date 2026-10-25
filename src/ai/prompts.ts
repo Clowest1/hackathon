@@ -1,4 +1,5 @@
-import type { Profession, Session, SessionEvent } from '../types';
+import { professionCards } from '../professions';
+import type { Profession, ProfessionId, Roadmap, Session, SessionEvent } from '../types';
 import type { LlmMessage } from './client';
 
 const levelLabel = { novice: 'новичок, без опыта в профессии', basic: 'есть база' } as const;
@@ -90,37 +91,6 @@ export function teamleadMessages(profession: Profession, session: Session): LlmM
   return [{ role: 'system', content: teamleadSystem(profession, session) }, ...withActions(chatHistory(session, 16), session)];
 }
 
-export function hintMessages(profession: Profession, session: Session): LlmMessage[] {
-  const hints = profession.task.hints[session.level ?? 'novice'];
-  const exhausted = session.hintsUsed >= hints.length;
-  const hint = hints[Math.min(session.hintsUsed, hints.length - 1)];
-  const instruction = exhausted
-    ? `Стажёр нажал «Подсказка», но подсказки закончились. Своими словами повтори последнюю: «${hint}» — и предложи один конкретный следующий шаг, всё ещё не называя ответ.`
-    : `Стажёр нажал «Подсказка». Перескажи своими словами подсказку №${session.hintsUsed + 1}: «${hint}». Привяжи её к тому, что стажёр уже сделал. Не давай больше, чем в ней.`;
-  return [
-    { role: 'system', content: teamleadSystem(profession, session) },
-    ...withActions([...chatHistory(session, 16), { role: 'user', content: `[Служебное сообщение] ${instruction}` }], session),
-  ];
-}
-
-/** Тимлид пишет первым: пользователь давно ничего не делает (или застрял после ошибки). */
-export function nudgeMessages(profession: Profession, session: Session, idleMinutes: number, afterError: boolean): LlmMessage[] {
-  const situation = afterError
-    ? `Последнее действие стажёра закончилось ошибкой, и он уже ${idleMinutes} мин ничего не делает.`
-    : `Стажёр уже ${idleMinutes} мин ничего не делает — возможно, застрял.`;
-  return [
-    { role: 'system', content: teamleadSystem(profession, session) },
-    ...withActions([
-      ...chatHistory(session, 16),
-      {
-        role: 'user',
-        content: `[Служебное сообщение, стажёр его не видит] ${situation} Напиши ему первой, как тимлид в мессенджере: 1–2 коротких предложения. ` +
-          'Опирайся на его последний шаг, спроси, где застрял, и предложи написать тебе или нажать «Подсказка». Новую подсказку сама не давай.',
-      },
-    ], session),
-  ];
-}
-
 function sessionReport(profession: Profession, session: Session): string {
   const result = session.result;
   const minutes = session.startedAt && session.finishedAt ? Math.max(1, Math.round((session.finishedAt - session.startedAt) / 60000)) : '?';
@@ -148,31 +118,22 @@ export function feedbackMessages(profession: Profession, session: Session): LlmM
   ];
 }
 
-export function roadmapMessages(profession: Profession, session: Session, otherProfessions: { id: string; title: string }[]): LlmMessage[] {
+export function roadmapMessages(profession: Profession, session: Session, weeks: Roadmap['weeks'], next?: ProfessionId): LlmMessage[] {
   const reflection = profession.reflectionQuestions
     .map((q) => `- ${q.text} → ${session.reflection?.[q.id] ?? 'нет ответа'}`)
     .join('\n');
+  const nextTitle = professionCards.find((p) => p.id === next)?.title;
   return [
     {
       role: 'system',
-      content: `Ты — карьерный наставник в IT. По итогам пробной рабочей задачи составь персональный план на 4 недели.
+      content: `Ты — карьерный наставник в IT. Стажёр прошёл пробную рабочую задачу. План на 4 недели уже составлен (см. ниже) — тебе нужно написать к нему короткое персональное резюме.
 Требования:
-- Каждый пункт привязан к тому, что реально было в задании (действия, ошибки, подсказки, ответы рефлексии).
-- Ресурсы — только реальные бесплатные ресурсы общего вида (официальная документация, известные бесплатные курсы и тренажёры). Не выдумывай ссылки; достаточно названия.
-- Если в рефлексии стажёр ответил «Скорее нет» или «Нет» на вопрос, хотел бы он делать такое каждый день, — честно скажи об этом в summary и предложи попробовать другую профессию в nextProfessionToTry. Иначе не указывай nextProfessionToTry.
-- Пиши по-русски, на «ты».
+- summary — 2–3 предложения: как прошло и к чему у стажёра склонность. Опирайся на конкретные действия, подсказки и ответы рефлексии.
+${nextTitle ? `- Стажёр ответил, что не хотел бы делать такое каждый день. Честно и по-доброму скажи об этом в summary и предложи попробовать профессию «${nextTitle}».\n` : ''}- strengths — 2–3 сильные стороны, gaps — 2–3 зоны роста. Каждая привязана к тому, что реально было в задании; не выдумывай действий, которых нет в логе. Сильные стороны и зоны роста не должны противоречить друг другу.
+- Пиши по-русски, на «ты», без общих фраз.
 
-Верни ТОЛЬКО JSON без пояснений, строго по схеме:
-{
-  "summary": "2–3 предложения: как прошло и к чему склонность",
-  "strengths": ["2–3 сильные стороны, привязанные к действиям"],
-  "gaps": ["2–3 зоны роста, привязанные к действиям"],
-  "weeks": [
-    { "week": 1, "focus": "тема недели", "tasks": ["2–3 конкретных задания"], "resources": ["1–2 ресурса"] }
-    // ровно 4 недели: week 1, 2, 3, 4
-  ],
-  "nextProfessionToTry": ${otherProfessions.map((p) => `"${p.id}"`).join(' | ')} // необязательно; ${otherProfessions.map((p) => `${p.id} — ${p.title}`).join(', ')}
-}`,
+Верни ТОЛЬКО JSON без пояснений:
+{ "summary": "...", "strengths": ["..."], "gaps": ["..."] }`,
     },
     {
       role: 'user',
@@ -181,7 +142,9 @@ export function roadmapMessages(profession: Profession, session: Session, otherP
 Фидбек тимлида: ${session.feedback ?? 'нет'}
 
 Рефлексия:
-${reflection}`,
+${reflection}
+
+План по неделям: ${weeks.map((w) => `${w.week}) ${w.focus}`).join('; ')}`,
     },
   ];
 }
